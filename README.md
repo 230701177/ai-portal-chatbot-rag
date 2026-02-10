@@ -112,8 +112,8 @@ This project proposes a **RAG-based AI chatbot** that:
 ---
 
 ## 👥 Team
-
-(Add your team member names here)
+- Satyaraj N (All Rounder)
+- Manoharan K (Frontend Developer)
 
 ---
 
