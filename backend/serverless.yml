@@ -1,0 +1,101 @@
+service: ai-portal-chatbot
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${env:AWS_REGION, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 300
+  environment:
+    S3_BUCKET: ${self:custom.s3Bucket}
+    OPENSEARCH_ENDPOINT: ${env:OPENSEARCH_ENDPOINT}
+    OPENSEARCH_INDEX: portal_knowledge
+    BEDROCK_REGION: ${env:AWS_REGION, 'us-east-1'}
+    EMBEDDING_MODEL_ID: amazon.titan-embed-text-v1
+    LLM_MODEL_ID: anthropic.claude-3-sonnet-20240229-v1:0
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource: "arn:aws:s3:::${self:custom.s3Bucket}/*"
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - es:ESHttpPost
+            - es:ESHttpPut
+            - es:ESHttpGet
+            - es:ESHttpDelete
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+custom:
+  s3Bucket: ai-portal-chatbot-docs-${self:provider.stage}
+
+functions:
+  ingestDocument:
+    handler: lambdas/ingestDocument.handler
+    events:
+      - http:
+          path: /ingest
+          method: post
+          cors: true
+    timeout: 300
+
+  queryChat:
+    handler: lambdas/queryChat.handler
+    events:
+      - http:
+          path: /query
+          method: post
+          cors: true
+    timeout: 60
+
+  listDocuments:
+    handler: lambdas/listDocuments.handler
+    events:
+      - http:
+          path: /documents
+          method: get
+          cors: true
+
+  deleteDocument:
+    handler: lambdas/deleteDocument.handler
+    events:
+      - http:
+          path: /documents/{documentId}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    DocumentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.s3Bucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+              AllowedHeaders:
+                - "*"
+
+plugins:
+  - serverless-offline
