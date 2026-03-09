@@ -2,6 +2,12 @@
 
 An enterprise-grade AI-powered knowledge assistant using **Retrieval-Augmented Generation (RAG)** to provide accurate, document-grounded answers with verified citations. Built with AWS serverless architecture.
 
+## 🌐 Live Demo
+
+**GitHub Pages**: https://230701177.github.io/ai-portal-chatbot-rag/
+
+Try it now! No installation required. The demo runs entirely in your browser with mock backend.
+
 ## 🚀 Quick Start
 
 ### Option 1: Mock Backend (5 Minutes - No AWS Required)
@@ -258,9 +264,9 @@ This project is submitted for hackathon evaluation and educational purposes.
 
 ## 🔗 Links
 
+- **Live Demo**: https://230701177.github.io/ai-portal-chatbot-rag/
 - **Repository**: https://github.com/230701177/ai-portal-chatbot-rag
-- **Demo**: Coming soon
-- **Documentation**: See project files
+- **Documentation**: See GITHUB_PAGES_SETUP.md for deployment guide
 
 ## 💡 Tips
 
