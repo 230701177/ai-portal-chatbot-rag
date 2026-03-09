@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { LoadingBar } from '@/components/LoadingBar'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'AI Portal Chatbot',
-  description: 'RAG-based AI chatbot for government portals',
+  title: 'AI Portal Assistant - Enterprise RAG Platform',
+  description: 'Document-grounded AI assistant powered by AWS Bedrock and OpenSearch',
 }
 
 export default function RootLayout({
@@ -16,7 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <LoadingBar />
+        {children}
+      </body>
     </html>
   )
 }

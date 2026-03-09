@@ -1,4 +1,12 @@
 import axios, { AxiosError } from 'axios';
+import {
+  mockChatService,
+  mockDocumentService,
+  mockAuthService,
+} from './mockApi';
+
+// Check if mock mode is enabled
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -41,7 +49,29 @@ export interface Document {
   status: string;
 }
 
-export const chatService = {
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+}
+
+export interface SignupRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+// Real API implementations
+const realChatService = {
   async query(question: string): Promise<QueryResponse> {
     try {
       const response = await api.post<QueryResponse>('/query', { question });
@@ -52,7 +82,7 @@ export const chatService = {
   },
 };
 
-export const documentService = {
+const realDocumentService = {
   async ingest(fileName: string, fileContent: string): Promise<IngestResponse> {
     try {
       const response = await api.post<IngestResponse>('/ingest', {
@@ -82,6 +112,53 @@ export const documentService = {
     }
   },
 };
+
+const realAuthService = {
+  async login(email: string, password: string): Promise<LoginResponse> {
+    try {
+      const response = await api.post<LoginResponse>('/auth/login', { email, password });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  async signup(name: string, email: string, password: string): Promise<LoginResponse> {
+    try {
+      const response = await api.post<LoginResponse>('/auth/signup', { name, email, password });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  async logout(): Promise<void> {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  async getCurrentUser() {
+    try {
+      const response = await api.get('/auth/me');
+      return response.data.user;
+    } catch (error) {
+      return null;
+    }
+  },
+
+  isAuthenticated(): boolean {
+    // Check for auth token in localStorage or cookies
+    return false; // Implement based on your auth strategy
+  },
+};
+
+// Export services based on mode
+export const chatService = USE_MOCK ? mockChatService : realChatService;
+export const documentService = USE_MOCK ? mockDocumentService : realDocumentService;
+export const authService = USE_MOCK ? mockAuthService : realAuthService;
 
 function handleApiError(error: unknown): Error {
   if (axios.isAxiosError(error)) {

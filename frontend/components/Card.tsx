@@ -1,18 +1,17 @@
 import { ReactNode } from 'react';
-import { clsx } from 'clsx';
 
 interface CardProps {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
+  hover?: boolean;
 }
 
-export function Card({ children, className }: CardProps) {
+export function Card({ children, className = '', hover = false }: CardProps) {
   return (
     <div
-      className={clsx(
-        'bg-white rounded-lg shadow-md border border-gray-200',
-        className
-      )}
+      className={`bg-card rounded border border-border shadow-card ${
+        hover ? 'hover:shadow-card-hover transition-shadow duration-200' : ''
+      } ${className}`}
     >
       {children}
     </div>
